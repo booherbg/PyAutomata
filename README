@@ -42,7 +42,7 @@ needed to build the module.
       into pyAutomata.so, a compiled python extension:
 
 For me this looks like:
-[blaine@macbook:~/Dropbox/src/Thesis/src/PyAutomata Mon Aug 22]
+[blaine@macbook:~/Dropbox/src/PyAutomata Mon Aug 22]
 7$ make
 mkdir -p build/temp.linux-x86_64-2.6/
 # Create some soft links just to make sure
