@@ -1,4 +1,9 @@
 '''
+(c) Blaine Booher 2010-2011
+Licensed under GPLv2.0
+automata-1.0 is Licensed under the Apache v2.0 license and (c) Alex Reynolds
+and (c) Blaine Booher
+
 Notes!
 
  /**********'-0__0-'***************************************-0__o-**************\
