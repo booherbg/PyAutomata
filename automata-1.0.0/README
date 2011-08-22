@@ -1,0 +1,67 @@
+This folder contains the source code for the 2D Cellular Automata engine.
+The engine is based off of "Automata.cpp" (c) 2008 Alex Reynolds.  Unfortunately
+I don't know the contact information for Alex Reynolds.  He released the engine
+under version 2.0 of the Apache License[0]  (http://www.apache.org/licenses/LICENSE-2.0.html).  
+
+There are several pieces of software here.
+  Automata.cpp and Automata.h
+    These are the original files obtained from Alex Reynolds.  I have modified them
+        to tailor them to my own project.  These modifications include:
+            * Removing 'bool' types for cython compatibility
+            * Adding a few extra "getters" for c-compatible export of the automata buffers
+                - Get current generation as a string
+                - Get current generation as byte array (unsigned char *)
+                - Get current generation as ASCII binary string ("0100101100").
+            * Added parameter storage (rule, start seed, etc).
+            * Fixed a couple of typos
+            * General restructuring to fit my code style, including formatting
+                brackets and whitespace
+                
+I have created a makefile that turns this into a compiled shared library.  Also
+there is a main.cpp that is used as a simple interface to the pure c++ object.
+The c++ class was well documented, but there are no run-time examples.  main.cpp
+provides some of those things but may change or be updated at any time as I'm 
+testing out various interfaces.
+
+In the folder "pyautomata" there is cython source code that taktes the C++ class
+and wraps the python C-extension boilerplate around it.  This allows the class
+to be imported into python as compiled code.
+    Automata.cpp / Automata.h => soft links to the files in the parent directory
+    PyAutomata.pyx:
+        This is a "cython" definition.  It defines how to expose the C++ methods
+        to the python extension module.  There is a python class defined which 
+        defines the methods and routines for the python extension object.  
+        This is a thin wrapper into the compiled automata.so.  Cython reads 
+        this file, both python code and "cython code", and produces the binary 
+        dynamic library (PyAutomata.so) that maps into the class defined in 
+        Automata.cpp.
+    PyAutomata.cpp: The code created by Cython from PyAutomata.pyx.  Use 'make'
+        to compile this into PyAutomata.so
+    PyAutomata.so: Python Extension Module.  use "import PyAutomata".
+    setup.py:   Python Distustils Script. python setup.py build_ext --inplace
+        I prefer using makefiles, so this script was used one time to generate
+            the g++ calls found in MakeFile
+    Makefile for building PyAutomata.so
+
+
+Footnotes:
+[0]
+This means, basically:
+  * Copyright maintained by all Contributers, including Alex Reynolds and Blaine Booher
+  * Royalty-Free, worldwide, irrevocable for any commercialization, public display,
+        or any other use.
+  * Must maintain copyright notice
+  
+GPL Considerations:
+From Wikipedia http://en.wikipedia.org/wiki/Apache_License [_]:
+The Apache Software Foundation and the Free Software Foundation (FSF) agree that 
+the Apache License 2.0 is a free software licence, compatible with version 3 of 
+the GNU General Public License (GPL).[_6]
+
+However, the Free Software Foundation considers all versions of the Apache License 
+(as of 2007) to be incompatible with the previous GPL versions 1 and 2.[_7][_8]
+
+It should be noted, however, that there is a one-way incompatibility between the 
+Apache version 2 and GPL version 3 licenses, in that you cannot include GPL 
+version 3 code in an Apache project without activating the requirement that the 
+entire project be relicensed under the GPL version 3.[_9]
