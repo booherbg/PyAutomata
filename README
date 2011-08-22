@@ -2,7 +2,7 @@ PyAutomata
 (c) Blaine Booher 2011
 
 PyAutomata is a lightweight 1D cellular automata framework. The original files are
-written in C++ as entirely object oriented and exist in automata-1.0 as an entirely 
+written in C++ as entirely object oriented and exist in automata-1.0.0 as an entirely 
 independent and pure C++ project.
 
 The engine is based off of "Automata.cpp" (c) 2008 Alex Reynolds.  Unfortunately
