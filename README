@@ -1,0 +1,4 @@
+Some random thoughts and notes on cellular automata
+00001000111000 is a pattern in rule 30 that causes finite state oscillatory pattern
+    in other words, rule 30 is not random for all inputs, only for some obviously
+    non-random inputs (like impulse 1).
