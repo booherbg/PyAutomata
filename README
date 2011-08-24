@@ -50,9 +50,9 @@ ln -s automata-1.0.0/Automata.h Automata.h
 # convert .pyx into .cpp file
 cython --cplus pyAutomata.pyx
 # The following was generated based on setup.py; python setup.py build_ext --inplace
-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC -I. -I/usr/include/python2.6 -c pyAutomata.cpp -o build/temp.linux-x86_64-2.6//pyAutomata.o
-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -fPIC -I. -I/usr/include/python2.6 -c Automata.cpp -o build/temp.linux-x86_64-2.6//Automata.o
-g++ -lm -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-x86_64-2.6//pyAutomata.o build/temp.linux-x86_64-2.6//Automata.o -lstdc++ -o pyAutomata.so
+gcc -O2 -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -I. -Iautomata-1.0.0/ -I/usr/include/python2.6 -c pyAutomata.cpp -o build/temp.linux-x86_64-2.6/pyAutomata.o
+gcc -O2 -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -I. -Iautomata-1.0.0/ -I/usr/include/python2.6 -c automata-1.0.0//Automata.cpp -o build/temp.linux-x86_64-2.6//automata-1.0.0/Automata.o
+g++ -lm -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-x86_64-2.6//pyAutomata.o build/temp.linux-x86_64-2.6//automata-1.0.0//Automata.o -lstdc++ -o pyAutomata.so
 
 The cython step is not necessary unless you wish to modify pyAutomata.pyx
 
