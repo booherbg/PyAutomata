@@ -30,7 +30,7 @@ To build
 The easiest thing to do is simply run "python setup.py build_ext". This will take
 the .cpp file (that was automatically generated with cython) and build it into a
 python extension that is wrapped around the automata C++ class. Requies the
-package python-setuptools
+package python-setuptools, python-dev, and cython to be installed
 
 If you want to build by hand, just check out the makefile. There are two steps
 needed to build the module.
