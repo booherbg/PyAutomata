@@ -461,6 +461,8 @@ unsigned long *Automata::chunks_FromGeneration(AutomataGeneration &g, unsigned i
  * 	do_something_like_have_tea_with(princess, n);
  * 	free(princess); // important, otherwise she will run rampant through the
  * 					// memory swamp like a banshee in the night. You don't want that.
+ *
+ * @TODO: I think there is a bug here, must check chunks for accurate shit
  */
 {
 	//unsigned char c;
@@ -505,6 +507,10 @@ unsigned long *Automata::chunks_FromGeneration(AutomataGeneration &g, unsigned i
 		num=0;
 		for (j=0; j<n; j++)
 		{
+			if (i >= g.size()) {
+				break;
+			}
+//			cout << i << " < " << g.size() << " < " << numchunks_out << endl;;
 			num += g[i]*pow(2, (n-1)-j);
 			//cout << g[i];
 			i++;
