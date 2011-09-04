@@ -53,9 +53,9 @@
 using namespace std;
 
 static const unsigned int kNumberOfRules =				8;
-static const unsigned int kAutomataGenerationLength =	128;//160 //divisible by 8 please (for byte chunking)
+static const unsigned int kAutomataGenerationLength =	64;//160 //divisible by 8 please (for byte chunking)
 																// or divisible by <organism_geneLength>
-static const unsigned int kAutomataGenerations =		150;//240
+static const unsigned int kAutomataGenerations =		50;//240
 
 // Defaults for Class Constructor
 static const unsigned int kDefaultRule =				30;

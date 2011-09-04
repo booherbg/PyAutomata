@@ -4,7 +4,36 @@ Licensed under GPLv2.0
 automata-1.0 is Licensed under the Apache v2.0 license and (c) Alex Reynolds
 and (c) Blaine Booher
 
+Try to document everything in this file, rather than the .cpp file. the .cpp 
+documentation is fine, but the doc strings in this file are what will show up
+on the python end of the runtime.
+
+The main ways to get data out of the cellular automata:
+    def bStringFromCurrentGeneration(self) '00101010 01110110'
+    def stringFromCurrentGeneration(self)  '  # # #   ### ## '
+    def chunks_FromCurrentGeneration(self,unsigned int bits=8) [
+    
+The main way to use iterate the cellular automata is easy:
+    def iterateAutomata(self)
+    
+Some helper functions for your convenience:
+    def fillBuffer(self)
+    
+from a python interpreter:
+from PyAutomata import pyautomata #That's this file!
+ca = pyautomata() # Instantiate with default params
+ca = pyautomata(110) # rule 110
+ca = pyautomata(110, 1000) # rule 110, 1000 cells
+
+print ca.stringFromCurrentGeneration()
+for i in xrange(100):
+    ca.iterateAutomata()
+    print ca.stringFromCurrentGeneration()
+
+That's about it!
+
 Notes!
+------
 
  /**********'-0__0-'***************************************-0__o-**************\
  |                                                                             |
@@ -158,7 +187,7 @@ cdef class pyautomata:
         self._overallIndex = 0
         self.updateParams()
         
-    def updateParams(self):
+    cdef updateParams(self):
         self.p_rule = self.thisptr.p_rule
         self.p_seedIsRandom = self.thisptr.p_seedIsRandom
         self.p_seedStartingPosition = self.thisptr.p_seedStartingPosition
@@ -166,7 +195,71 @@ cdef class pyautomata:
         
     def init_seed(self, *args):
         '''
-            init_seed
+            Initialize (seed) the cellular automata. Call this immediately after
+            the creation of an organism. init_seed() is called upon organism 
+            creation, so only call this if you aren't satisfied with the default
+            impulse (single cell on in the middle of the vector).
+            
+            init_seed(mode, position, value)
+            init_seed(values[])
+            
+            If you use the first method:
+            mode 0 (position and value ignored): center impulse
+                In mode 0, regardless of the values of position and value, the
+                cellular automata is initialized with a single 1 (impulse) in 
+                the center cell of the vector in a sea of 0s.
+                ca.init_seed()
+                ca.init_seed(0)
+                
+            mode 1 (position and value ignored): 50% density random seed
+                In mode 1, regardless of the values of position and value, the 
+                cellular automata is initialized to a random seed. Every cell has
+                a 50% chance of being a 1 or 0, which means this is an even 
+                density random seed. Future modes may compensate for normal 
+                random density or similar
+                ca.init_seed(1)
+                
+            mode 2 (position, value provided): Seed with value @ position
+                In mode 2, the binary representation of the integer passed as 
+                the second paramter is packed into the cellular automata array 
+                with the left most bit being located at the index specified in
+                the first argument, <position>
+                ca.init_seed(2, 255, 50)
+                
+            special mode (values[])
+            This special call is accessed by passing into init_seed a list or
+            tuple of integers. The binary representation of these integers are
+            set into the cellular automata, starting at the left side of the 
+            vector. The binary bits are packed from left to right until either 
+            there are no more bits, or the end of the CA vector is reached. If 
+            the end of the CA vector is reached, the rest of the bits are simply
+            truncated.
+            
+            Future versions may support a second position to indicate whether to
+            left, center, or right-justify the starting values. 
+            
+            *** Documentation for future reference regarding 
+                                                    how args are handled: ***
+            # args
+            0       ca.init_seed() (default params)
+            1       if the arg is a list or tuple: ca.init_seed(arg[], len(arg))
+            1       if not list or tuple: init_seed(arg) (default param2 and param3)
+            2       ca.init_seed(arg1, arg2) (default arg3)
+            3       ca.init_seed(arg1, arg2, arg3) (no default params)
+            
+            use like this:
+            init_seed():    seed with impulse in center
+            init_seed(0):   seed with impulse in center
+            init_seed(1):   seed with random, 50% density
+            init_seed(1,2): seed with random, 50% density (param2 is ignored)
+            init_seed(2,500,50):  seed with the value 500 at position 50
+            
+            and a special call with a list:
+            init_seed((10, 50, 100, 255)): seed the ca with the the binary
+                    version of 10, 50, 100, and 255 packed into the vector
+                    starting from the left of the cell. If these values over
+                    run the vector, the bits will simply be truncated.
+                    
         '''
         cdef unsigned int n
         cdef unsigned int *p1
@@ -218,6 +311,13 @@ cdef class pyautomata:
             Executes iterateAutomata() <kAutomataGenerations> times.  If the number
             of generations is > kAutomataGenerations, I believe the buffer pointer
             is reset back into the beginning of the buffer (and execution is skipped).
+            
+            Internally to the ca there is a 2-D buffer that holds a history of 
+            the generations. If it is 100 rows long, it holds 100 generations of
+            "history". When the 101st generation is executed, the pointer wraps
+            around and the 101st generation is stored in buffer[0], overwriting
+            the 1st generation. fillBuffer() simply executes the cellular automata
+            enough times to fill up the buffer. 
         '''
         self.thisptr.fillBuffer()
         self._overallIndex = self.thisptr._overallIndex
@@ -245,6 +345,8 @@ cdef class pyautomata:
             to dump ascii binary data to stdout for processing
         
             a good "last resort", guaranteed way of accessing computed data
+            
+            returns something like '0011010100100100111'
         '''
         cdef string str1 = self.thisptr.bStringFromCurrentGeneration()
         #print str[0]
@@ -262,6 +364,9 @@ cdef class pyautomata:
         '''
             Returns the string representation of the current generation, with the 
             characters defined in Automata.h
+            
+            return something like:
+            '   #     ###      # ##       '
         '''
         cdef string str1 = self.thisptr.stringFromCurrentGeneration()
         cdef char *cstr = <char*>malloc(str1.size() + 1)
@@ -273,6 +378,9 @@ cdef class pyautomata:
     def chunks_FromCurrentGeneration(self,unsigned int bits=8):
         '''
             Returns the unsigned byte representation of the current generation
+            
+            returns something like:
+            [455, 642, 325, 32]
         '''
         cdef unsigned long *c
         cdef unsigned int n

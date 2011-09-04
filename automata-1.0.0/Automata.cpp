@@ -58,6 +58,20 @@
  * 		on the python side).  At this point in time I'm not sure how to directly
  * 		access the AutomataGeneration bitset, however it appears that there is no
  * 		immediate need for direct access.  These supporting functions are doing just fine.
+ *
+ * 	Possible Bugs:
+ *   	Interestingly enough, it appears that the following happens:
+ *   	1) _generations = new AutomataGenerations is initialized to <kAutomataGenerations> rows
+ *   	2) I think each row in AutomataGenerations is created with default constructor (kAutomataGenerationLength)
+ *   	3) Once the true ca width comes through, either the size() is updated to a brand new
+ *   		vector (leaving the first vectors hanging in memory) or the print-off
+ *   		is restricted to the correct range. Not sure, yet.
+ *   	Either way something strange is happening
+ *
+ *   	Seems that a new vector is created every single time, and is either copied
+ *   	or replaces the existing vector. Either way a single destructor is called
+ *   	with every constructor, there doesn't seem to be any dangling pointers.
+ *   	All is good and sane.
  */
 
 #include "Automata.h"
@@ -85,12 +99,19 @@ AutomataGeneration::AutomataGeneration(unsigned int generationLength)
 
 }
 
+/* It appears that this is being called the appropriate number of times */
+/*
+AutomataGeneration::~AutomataGeneration() {
+	cout << "deleting vector" << endl;
+}
+*/
+
 void AutomataGeneration::reset()
 {
 	//cout << "AutomataGeneration::reset();size=" << generationLength << "|" << (*this->_vector).size() << "\n";
 	for (unsigned int i=0; i < generationLength; i++)
 	{
-		(*this->_vector)[i] = 0;
+		(*this->_vector)[i] = 0; // shorthand for clearing a bitset
 	}
 }
 
@@ -113,11 +134,11 @@ Automata::Automata(
 		unsigned int seedStartingPosition,
 		unsigned int generationLength) {
 */	){
-	cout << "Initializing automaton... (rule: " << rule
+//	cout << "Initializing automaton... (rule: " << rule
 /*			", generationLength: " << generationLength <<
 //			", seedIsRandom: " << seedIsRandom <<
 //			", seedStartingPosition: " << seedStartingPosition << ")"
-*/			<< ")" << endl;
+			<< ")" << endl; */
 	this->p_rule=rule;
 //	this->p_seedIsRandom=seedIsRandom;
 //	this->p_seedStartingPosition=seedStartingPosition;
@@ -126,7 +147,7 @@ Automata::Automata(
 	try {
 		_currentIndex = -1;
 		_overallIndex = -1;
-		_generations = new AutomataGenerations(kAutomataGenerations);
+		_generations = new AutomataGenerations(kAutomataGenerations); // 150
 
 		//typedef std::bitset< kAutomataGenerationLength >	AutomataGeneration;
 		//typedef std::vector< AutomataGeneration >			AutomataGenerations;
@@ -175,6 +196,10 @@ void Automata::init_seed(unsigned int mode, unsigned int value, unsigned int pos
 	*/
 	this->p_seedIsRandom=0;
 	this->p_seedStartingPosition=kDefaultSeedStartingPosition;
+
+	// reset back to the head of the buffer!
+	this->_currentIndex = -1;
+	this->_overallIndex = -1;
 
 	AutomataGeneration *g_seed=NULL;
 	//try
@@ -255,6 +280,8 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 		cout << exc.what() << endl;
 	}
 
+	// what does this next line do? I forget. Why is '4' hard coded?
+	// looks like position is hard coded. That's weird.
 	unsigned int position = (unsigned int)((sizeof(unsigned int)*4)/2);
 	unsigned int value;
 	for (i=0; i<n; i++)
@@ -337,7 +364,7 @@ void Automata::iterateAutomata () {
 
 		if (_currentIndex == -1)
 		{
-			init_seed();
+			init_seed(0);
 		}
 
 		generationAtIndex(*current, _currentIndex);
@@ -361,16 +388,33 @@ void Automata::printBuffer () const {
 	 * 		generation present in the buffer.  Then that generation is printed
 	 * 		out as a single line (via stringFromGeneration()).
 	 */
+	unsigned int const max_digits = 7;
 	if (_currentIndex == -1)
 	{
 		cout << "*** Warning: Cellular Automata not seeded.  Please use init_seeds()\n";
 		return;
 	}
-
+	unsigned int digits=0;
 	AutomataGeneration *test = new AutomataGeneration(p_generationLength);
+	cout << "test size to start out with is: " << (*test).size() << endl;
 	for (unsigned int i = 0; i < kAutomataGenerations; ++i) {
 		generationAtIndex(*test, i);
-		cout << i << " " << stringFromGeneration(*test) << endl;
+		digits = log10(i); // see how many positions we need
+		if (digits > max_digits)
+		{
+			digits = max_digits;
+		}
+		if (digits <0)
+		{
+			digits = 0;
+		}
+
+		for (unsigned int j=0; j<(max_digits-digits); j++)
+		{
+			cout << " ";
+		}
+		cout << "length: >>" << (*test).size() << " " << p_generationLength << " ";
+		cout << i << "|" << stringFromGeneration(*test) << "|" << endl;
 	}
 	delete test;		
 }
@@ -605,6 +649,7 @@ void Automata::getGeneration (AutomataGeneration &output, unsigned int index) co
 	// AutomataGeneration in the <vector> _generations into the fresh
 	// AutomataGeneration &output.  A pointer to _generations is not desired
 	// to protect data integrity (read-only).
+	// @TODO if output already points at a vector, does it create a dangling pointer?
 	output = _generations->at(index);
 }
 
@@ -628,6 +673,9 @@ void Automata::appendGeneration (AutomataGeneration &g)
 {
 	//increment indices and append generation to the buffer
     _overallIndex++;
+    if (_currentIndex < 0) {
+    	_currentIndex = -1; // protection
+    }
     _currentIndex = (_currentIndex + 1) % kAutomataGenerations; //wrap-around
     _generations->at(_currentIndex) = g; // copy? has to be, g gets deleted()
     //_currentGeneration = g;
