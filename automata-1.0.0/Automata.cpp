@@ -254,21 +254,25 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 	 * cellular automata.  This was moved out of the constructor.  I needed the option
 	 * of specifying that the seed is random, a single cell, or a pre-set value.
 	 *
-	 * Throws exception 100 if the mode is invalid.
-	AutomataGeneration *g_seed = new AutomataGeneration;
-	if (seedIsRandom)
-		randomizeSeed(*g_seed);
-	else
-		initializeSeedAtPosition(*g_seed, seedStartingPosition);
-
-	validateGeneration(*g_seed);
-	appendGeneration(*g_seed);
-	delete g_seed;
+	 * This function takes a list of 8-bit unsigned integers and places them
+	 * into the a generation. The seeding is kind of strange but it works, so I'm
+	 * not sure if I'm going to leave it as is or not...
+	 *
+	 * Basically the value in values[0] is mapped onto the generation from the
+	 * left side, but it is "reversed" the bit value. So if the number that is
+	 * seeded is 135, in binary that is 10000111. The seeded value is:
+	 *     (left) | 11100001 <second value> <third value> |
+	 * So you can see that the value is seeded but it is seeded in reverse.
+	 * Not a huge deal, but kind of strange.
 
 	*/
 	unsigned int i;
 	this->p_seedIsRandom=0;
 	this->p_seedStartingPosition=kDefaultSeedStartingPosition;
+
+	// reset back to the head of the buffer!
+	this->_currentIndex = -1;
+	this->_overallIndex = -1;
 
 	AutomataGeneration *g_seed=NULL;
 	try
@@ -282,21 +286,74 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 
 	// what does this next line do? I forget. Why is '4' hard coded?
 	// looks like position is hard coded. That's weird.
+	// each value is an unsigned int. sizeof(unsigned int) == 16
 	unsigned int position = (unsigned int)((sizeof(unsigned int)*4)/2);
-//	cout << "initial position: " << position << endl;
+	cout << "initial position: " << position << endl;
 	unsigned int value;
 	for (i=0; i<n; i++)
 	{
 		value = values[i];
 		initializeSeedWithValue(*g_seed, value, position);
 		position += sizeof(unsigned int)*4;
-//		cout << "next position: " << position << endl;
+		cout << "next position: " << position << endl;
 	}
 	//cout << g_seed->count() << "------\n";
 	validateGeneration(*g_seed);
 	appendGeneration(*g_seed); // increments _generationIndex
 	delete g_seed;
 }
+
+void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int value, unsigned int position)
+{
+	// Sets the AutomataGeneration to an equivalent bitstring
+	// Make sure we do bounds checking in case <value> is larger than the size of <seed>
+	// position must be a "centered" value?
+
+	unsigned int n = (int)ceil(log2(value)); // number of bits required
+	n = sizeof(unsigned int)*4;
+	unsigned int w=0;
+	unsigned int k=value;
+	bool bit = 0;
+
+	cout << "position: " << position << endl;
+
+	// w is the starting position of where we will start writing the seed
+	// n is the width of the chunk to write, typically hard coded to be 16-bits
+	if (n > seed.size())
+	{
+		cout << "Warning: truncating seed because it is too large. ";
+		cout << n << "-bits truncated to " << seed.size() << "-bits\n";
+		n = seed.size();
+	}
+
+	// if we're trying to center too close to the end of the vector, no good
+	if (position >= (seed.size() - ((n/2))))
+			position = seed.size() - (n/2) - 1;
+
+	if (position <= ((n/2)+1))
+	{
+		w = 0; // start at the beginning
+	} else
+	{
+		// set w as offset from the <position>
+		w = (position - (n/2) + 1);
+	}
+	//cout << "center: " << position << " w:" << w << endl;
+	// position is the centered location for the value, w is the beginning index
+//	for (unsigned int i=0; i < n; ++i)
+	for (unsigned int i=(n); i > 0; i--) // weird, if we do >= 0 it wraps around into an infinite loop
+	{
+		// for each bit, set it appropriately
+		bit = k % 2;
+		if (bit == 1)
+		{
+			seed.set((i+w-1)); // right most bit is 0
+		}
+//		cout << (i-1) << ":" << bit << " ";
+		k = k / 2;
+	}
+}
+
 
 Automata::Automata(const Automata& ref, unsigned int seedFromEndOfRef) {
 	_currentIndex = ref._currentIndex;
@@ -712,52 +769,7 @@ void Automata::initializeCurrentGeneration(unsigned int value)
     delete g;
 }*/
 
-void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int value, unsigned int position)
-{
-	// Sets the AutomataGeneration to an equivalent bitstring
-	// Make sure we do bounds checking in case <value> is larger than the size of <seed>
-//	>>> for i in range(n):
-//	...    print i, k % 2
-//	...    k /= 2
 
-	unsigned int n = (int)ceil(log2(value)); // min 16
-	n = sizeof(unsigned int)*4;
-	unsigned int w=0;
-	unsigned int k = value;
-	bool bit = 0;
-
-	if (n > seed.size())
-	{
-		cout << "Warning: truncating seed because it is too large. ";
-		cout << n << "-bits truncated to " << seed.size() << "-bits\n";
-		n = seed.size();
-	}
-
-	if (position >= (seed.size() - ((n/2))))
-			position = seed.size() - (n/2) - 1;
-
-	if (position <= ((n/2)+1))
-	{
-		w = 0;
-	} else
-	{
-		w = (position - (n/2) + 1); // index into entire bit vector
-	}
-	//cout << "center: " << position << " w:" << w << endl;
-	for (unsigned int i=0; i < n; ++i)
-	{
-		// for each bit, set it appropriately
-		bit = k % 2;
-		if (bit == 1)
-		{
-			seed.set((i+w)); // right most bit is 0
-		}
-		//cout << (i) << ":" << bit << " ";
-		k = k / 2;
-	}
-	//cout << endl;
-
-}
 
 /*
  * Private Members & Functions
