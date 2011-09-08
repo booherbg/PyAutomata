@@ -200,6 +200,9 @@ cdef class pyautomata:
             creation, so only call this if you aren't satisfied with the default
             impulse (single cell on in the middle of the vector).
             
+            NOTE: even though the data types can handle 32-bit values, we force
+            each seed into 16-bit values so that it is easier to handle.
+            
             init_seed(mode, position, value)
             init_seed(values[])
             

@@ -304,9 +304,9 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 
 	// what does this next line do? I forget. Why is '4' hard coded?
 	// looks like position is hard coded. That's weird.
-	// each value is an unsigned int. sizeof(unsigned int) == 4 (bytes) = 4*8=16-bit
+	// each value is an unsigned int. sizeof(unsigned int) == 4 (bytes) = 4*8=16
 	// next up: why do we set the position as the center?
-//	unsigned int position = (unsigned int)((sizeof(unsigned int)*BITS_PER_BYTE)/2);
+//	unsigned int position = (unsigned int)((sizeof(unsigned int)*BITS_PER_SEED_VALUE)/2);
 	unsigned int position = 0; // start at left-most side
 	cout << "initial position: " << position << endl;
 	unsigned int value;
@@ -314,7 +314,7 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 	{
 		value = values[i];
 		initializeSeedWithValue(*g_seed, value, position);
-		position += sizeof(unsigned int)*BITS_PER_BYTE;
+		position += sizeof(unsigned int)*BITS_PER_SEED_VALUE;
 		cout << "next position: " << position << endl;
 	}
 	//cout << g_seed->count() << "------\n";
@@ -330,10 +330,22 @@ void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int v
 	 * 	seed is an AutomataGeneration object to be worked with
 	 *  value is what value to seed with. unsigned int, so 16-bit by nature
 	 *
+	 * BITS_PER_SEED_VALUE will determine how many bits we'll use of <value>,
+	 * although all entries in <value> will be packed tightly into the vector
+	 * See Automata.h to set BITS_PER_SEED_VALUE
+	 * 1: Use only the first 4 bits (0-15)
+	 * 2: Use only the first 8 bits (0-255)
+	 * 4: use only the first 16 bits (0-65535)
+	 * 8: use entire range of the unsigned int: (0-4294967295)
+	 *
+	 * in other words, if BITS_PER_SEED_VALUE is 2:
+	 * 		init_seed((255, 255, 255, 255))
+	 * is the equivalent of the following if BITS_PER_SEED is 4:
+	 * 		init_seed((65535, 65535))
 	 */
 
 	unsigned int n = (int)ceil(log2(value)); // number of bits required
-	n = sizeof(unsigned int)*BITS_PER_BYTE; // how many bits per chunk (16-bit)
+	n = sizeof(unsigned int)*BITS_PER_SEED_VALUE; // how many bits per chunk (16-bit)
 	bool bit = 0;
 
 //	cout << "position: " << position << endl;

@@ -52,9 +52,18 @@
 
 using namespace std;
 
-// this shouldn't be a problem, right?
-// used with init_seed, now that i see it i think we should use short.
-#define BITS_PER_BYTE 4
+/*
+* BITS_PER_SEED_VALUE will determine how many bits we'll use out of each value
+* in the list handed to init_seed to seed the cellular automata vector. the
+* remaining bits will be discarded.
+* Regardless of this value, all entries in the seed array will be packed tightly
+* into the vector
+* 1: Use only the first 4 bits (values 0-15)
+* 2: Use only the first 8 bits (values 0-255)
+* 4: use only the first 16 bits (values 0-65535)
+* 8: use entire range of the unsigned int: (values 0-4294967295)
+* */
+#define BITS_PER_SEED_VALUE 2
 
 static const unsigned int kNumberOfRules =				8;
 static const unsigned int kAutomataGenerationLength =	64;//160 //divisible by 8 please (for byte chunking)
