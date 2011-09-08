@@ -264,6 +264,24 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 	 *     (left) | 11100001 <second value> <third value> |
 	 * So you can see that the value is seeded but it is seeded in reverse.
 	 * Not a huge deal, but kind of strange.
+	 *
+	 * Let's say the vector looks like this:
+	 *  0         10        20        30        40         50
+	 *  |         |         |         |         |          |
+	 * |____________________________________________________|
+	 *
+	 * If I want to make it look like this:
+	 *  0         10        20        30        40         50
+	 *  |         |         |         |         |          |
+	 * |__________11111100000_______________________________|
+	 * What convention do I use? Do i say I want 1111100000 at 10? Do I say I
+	 * want 0000011111 at 20? Do I say I want 1111100000 at 15?
+	 *
+	 * I'm choosing that I say I want 1111100000 at 10. So you pass in a value
+	 * that has left-most-significant-bit (16-bits) and the left-most index that
+	 * you want to include the number (16-bit).
+	 *
+	 * so init_seed(value=0b1111100000, position=10) should work.
 
 	*/
 	unsigned int i;
@@ -286,15 +304,17 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 
 	// what does this next line do? I forget. Why is '4' hard coded?
 	// looks like position is hard coded. That's weird.
-	// each value is an unsigned int. sizeof(unsigned int) == 16
-	unsigned int position = (unsigned int)((sizeof(unsigned int)*4)/2);
+	// each value is an unsigned int. sizeof(unsigned int) == 4 (bytes) = 4*8=16-bit
+	// next up: why do we set the position as the center?
+//	unsigned int position = (unsigned int)((sizeof(unsigned int)*BITS_PER_BYTE)/2);
+	unsigned int position = 0; // start at left-most side
 	cout << "initial position: " << position << endl;
 	unsigned int value;
 	for (i=0; i<n; i++)
 	{
 		value = values[i];
 		initializeSeedWithValue(*g_seed, value, position);
-		position += sizeof(unsigned int)*4;
+		position += sizeof(unsigned int)*BITS_PER_BYTE;
 		cout << "next position: " << position << endl;
 	}
 	//cout << g_seed->count() << "------\n";
@@ -305,19 +325,19 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 
 void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int value, unsigned int position)
 {
-	// Sets the AutomataGeneration to an equivalent bitstring
-	// Make sure we do bounds checking in case <value> is larger than the size of <seed>
-	// position must be a "centered" value?
+	/*
+	 * initializeSeedWithValue
+	 * 	seed is an AutomataGeneration object to be worked with
+	 *  value is what value to seed with. unsigned int, so 16-bit by nature
+	 *
+	 */
 
 	unsigned int n = (int)ceil(log2(value)); // number of bits required
-	n = sizeof(unsigned int)*4;
-	unsigned int w=0;
-	unsigned int k=value;
+	n = sizeof(unsigned int)*BITS_PER_BYTE; // how many bits per chunk (16-bit)
 	bool bit = 0;
 
-	cout << "position: " << position << endl;
+//	cout << "position: " << position << endl;
 
-	// w is the starting position of where we will start writing the seed
 	// n is the width of the chunk to write, typically hard coded to be 16-bits
 	if (n > seed.size())
 	{
@@ -327,30 +347,21 @@ void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int v
 	}
 
 	// if we're trying to center too close to the end of the vector, no good
-	if (position >= (seed.size() - ((n/2))))
-			position = seed.size() - (n/2) - 1;
+	if (position > (seed.size() - n))
+		position = seed.size() - n;
 
-	if (position <= ((n/2)+1))
-	{
-		w = 0; // start at the beginning
-	} else
-	{
-		// set w as offset from the <position>
-		w = (position - (n/2) + 1);
-	}
-	//cout << "center: " << position << " w:" << w << endl;
-	// position is the centered location for the value, w is the beginning index
+//	cout << "left: " << position << " w:" << w << endl;
 //	for (unsigned int i=0; i < n; ++i)
 	for (unsigned int i=(n); i > 0; i--) // weird, if we do >= 0 it wraps around into an infinite loop
 	{
 		// for each bit, set it appropriately
-		bit = k % 2;
+		bit = value % 2;
 		if (bit == 1)
 		{
-			seed.set((i+w-1)); // right most bit is 0
+			seed.set((i+position-1));
 		}
 //		cout << (i-1) << ":" << bit << " ";
-		k = k / 2;
+		value = value / 2;
 	}
 }
 

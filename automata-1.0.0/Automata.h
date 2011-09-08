@@ -52,6 +52,10 @@
 
 using namespace std;
 
+// this shouldn't be a problem, right?
+// used with init_seed, now that i see it i think we should use short.
+#define BITS_PER_BYTE 4
+
 static const unsigned int kNumberOfRules =				8;
 static const unsigned int kAutomataGenerationLength =	64;//160 //divisible by 8 please (for byte chunking)
 																// or divisible by <organism_geneLength>
