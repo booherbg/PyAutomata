@@ -258,10 +258,18 @@ cdef class pyautomata:
             init_seed(2,500,50):  seed with the value 500 at position 50
             
             and a special call with a list:
+            each value in the list is currently limited to 8-bits (0-255). In 
+            reality the container can store up to 32-bits, so change Automata.h
+            if you want to use larger seed values.
+            (255,255,255,255) with 8-bits is equivalent to (65535,65535) with 16-bits
+            make sense?
             init_seed((10, 50, 100, 255)): seed the ca with the the binary
                     version of 10, 50, 100, and 255 packed into the vector
                     starting from the left of the cell. If these values over
-                    run the vector, the bits will simply be truncated.
+                    run the vector, the bits will simply be truncated. Also if 
+                    your integer is too large, only the first 8 bits will be 
+                    accepted (if BITS_PER_SEED_VALUE in Automata.h is set up 
+                    for 8-bits)
                     
         '''
         cdef unsigned int n
