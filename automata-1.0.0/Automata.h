@@ -127,6 +127,7 @@ public:
 
 	// public variables
 	unsigned int p_rule;
+	unsigned int p_caWidth;
 	unsigned int p_seedIsRandom;
 	unsigned int p_seedStartingPosition;
 	unsigned int p_generationLength;
