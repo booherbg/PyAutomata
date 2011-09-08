@@ -66,8 +66,9 @@ pa.init_seed(0) # initialize with single "on" bit
 # for a more complicated seed:
 #pa.init_seed([2**16-1,0,2**16-1,0, 2**16-1, 0, 2**16, 0, 2**14+1])
 print "|%s|" % pa.stringFromCurrentGeneration()
-pa.iterateAutomata()
-print "|%s|" % pa.stringFromCurrentGeneration()
-for i in range(generations):
+#pa.iterateAutomata()
+#print "|%s|" % pa.stringFromCurrentGeneration()
+for i in range(generations-1):
     pa.iterateAutomata()
     print "|%s|" % pa.stringFromCurrentGeneration()
+    print pa.chunks_FromCurrentGeneration(8)

@@ -283,12 +283,14 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 	// what does this next line do? I forget. Why is '4' hard coded?
 	// looks like position is hard coded. That's weird.
 	unsigned int position = (unsigned int)((sizeof(unsigned int)*4)/2);
+//	cout << "initial position: " << position << endl;
 	unsigned int value;
 	for (i=0; i<n; i++)
 	{
 		value = values[i];
 		initializeSeedWithValue(*g_seed, value, position);
 		position += sizeof(unsigned int)*4;
+//		cout << "next position: " << position << endl;
 	}
 	//cout << g_seed->count() << "------\n";
 	validateGeneration(*g_seed);
@@ -413,7 +415,7 @@ void Automata::printBuffer () const {
 		{
 			cout << " ";
 		}
-		cout << "length: >>" << (*test).size() << " " << p_generationLength << " ";
+//		cout << "length: >>" << (*test).size() << " " << p_generationLength << " ";
 		cout << i << "|" << stringFromGeneration(*test) << "|" << endl;
 	}
 	delete test;		
