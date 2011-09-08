@@ -114,7 +114,7 @@ cdef extern from "Automata.h" namespace "Automata":
     cdef cppclass AutomataGenerations:
         pass
     cdef cppclass Automata:
-        unsigned int p_rule,p_caWidth,p_seedIsRandom,p_seedStartingPosition,p_generationLength
+        unsigned int p_rule,p_seedIsRandom,p_seedStartingPosition,p_generationLength
         int _overallIndex
         Automata()
         Automata(int)
@@ -158,7 +158,7 @@ cdef class pyautomata:
     define self.p_rule here with a cdef public / readonly statement. readonly means
     that outside *this* object, nothing can modify the variable
     '''
-    cdef readonly unsigned int p_rule, p_caWidth, p_seedIsRandom, p_seedStartingPosition, p_generationLength
+    cdef readonly unsigned int p_rule, p_seedIsRandom, p_seedStartingPosition, p_generationLength
     cdef public _overallIndex
     cdef Automata *thisptr
     def __cinit__(self, *args):
@@ -189,7 +189,6 @@ cdef class pyautomata:
         
     cdef updateParams(self):
         self.p_rule = self.thisptr.p_rule
-        self.p_caWidth = self.thisptr.p_caWidth
         self.p_seedIsRandom = self.thisptr.p_seedIsRandom
         self.p_seedStartingPosition = self.thisptr.p_seedStartingPosition
         self.p_generationLength = self.thisptr.p_generationLength
