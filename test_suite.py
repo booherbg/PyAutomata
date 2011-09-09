@@ -1,3 +1,11 @@
+'''
+Compare the outputs from the pure python to the pure c++ to ensure that they 
+are sane and both are implemented correctly.
+
+The pure python is so that we can use pypy to see if it is faster with pyEvolve, 
+the c++ is much quicker than all implementations in python.
+
+'''
 import automata as pa
 import pyAutomata as pb
 
