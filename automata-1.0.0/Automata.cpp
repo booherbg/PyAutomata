@@ -308,14 +308,14 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 	// next up: why do we set the position as the center?
 //	unsigned int position = (unsigned int)((sizeof(unsigned int)*BITS_PER_SEED_VALUE)/2);
 	unsigned int position = 0; // start at left-most side
-	cout << "initial position: " << position << endl;
+//	cout << "initial position: " << position << endl;
 	unsigned int value;
 	for (i=0; i<n; i++)
 	{
 		value = values[i];
 		initializeSeedWithValue(*g_seed, value, position);
 		position += sizeof(unsigned int)*BITS_PER_SEED_VALUE;
-		cout << "next position: " << position << endl;
+//		cout << "next position: " << position << endl;
 	}
 	//cout << g_seed->count() << "------\n";
 	validateGeneration(*g_seed);

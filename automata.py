@@ -125,16 +125,15 @@ class Automata(object):
             mode = args[0]
             value = kDefaultSeed
             position = kDefaultSeedStartingPosition
-        elif len(args) == 2:
-            #@TODO this is because of the bitset
-            # Special init_seed with full value
             if type(args[0]) == type([]) or type(()):
                 self.init_seed_values(args[0])
                 return
-            else:
-                mode = args[0]
-                value = args[1]
-                position = kDefaultSeedStartingPosition
+        elif len(args) == 2:
+            #@TODO this is because of the bitset
+            # Special init_seed with full value
+            mode = args[0]
+            value = args[1]
+            position = kDefaultSeedStartingPosition
         elif len(args) == 3:
             mode, value, position = args
             
