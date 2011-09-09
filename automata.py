@@ -74,7 +74,7 @@ class AutomataGeneration(object):
     def __setitem__(self, pos, val):
         self._vector[pos] = val
     
-class Automata(object):
+class pyautomata(object):
     # public
     #typedev bitset <10> aaa; # unused?
     p_rule = 30
