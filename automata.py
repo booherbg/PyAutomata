@@ -125,7 +125,7 @@ class pyautomata(object):
             mode = args[0]
             value = kDefaultSeed
             position = kDefaultSeedStartingPosition
-            if type(args[0]) == type([]) or type(()):
+            if type(args[0]) == type([]) or type(args[0]) == type(()):
                 self.init_seed_values(args[0])
                 return
         elif len(args) == 2:

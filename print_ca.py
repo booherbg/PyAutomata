@@ -5,13 +5,20 @@ to run and test:
 python testboyx.py
 
 this is basically a small unit test for pyAutomata.so
+
+This is a fun one!
 '''
-from pyAutomata import pyautomata
 import sys
+if "--python" in sys.argv:
+    from automata import pyautomata
+else:
+    from pyAutomata import pyautomata
+
 
 def usage():
-    print '%s <rule> <width> <generations>' % (sys.argv[0])
+    print '%s <rule> <width> <generations> [--python]' % (sys.argv[0])
     print ' ex: %s 30 60 20' % (sys.argv[0])
+    print 'python print_ca.py 30 10000 10000 --python for an animation, haha'
     print ' expected output:'
     print '''Initializing automaton... (rule: 30)
 |                              #                             |
@@ -71,4 +78,4 @@ print "|%s|" % pa.stringFromCurrentGeneration()
 for i in range(generations-1):
     pa.iterateAutomata()
     print "|%s|" % pa.stringFromCurrentGeneration()
-    print pa.chunks_FromCurrentGeneration(8)
+#    print pa.chunks_FromCurrentGeneration(8)
