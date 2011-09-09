@@ -478,15 +478,20 @@ void Automata::printBuffer () const {
 	}
 	unsigned int digits=0;
 	AutomataGeneration *test = new AutomataGeneration(p_generationLength);
-	cout << "test size to start out with is: " << (*test).size() << endl;
+//	cout << "test size to start out with is: " << (*test).size() << endl;
 	for (unsigned int i = 0; i < kAutomataGenerations; ++i) {
 		generationAtIndex(*test, i);
-		digits = log10(i); // see how many positions we need
+		if (i == 0)
+		{
+			digits = 0;
+		} else {
+			digits = log10(i); // see how many positions we need
+		}
 		if (digits > max_digits)
 		{
 			digits = max_digits;
 		}
-		if (digits <0)
+		if (digits < 0)
 		{
 			digits = 0;
 		}

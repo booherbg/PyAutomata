@@ -8,9 +8,9 @@ import random
 BITS_PER_SEED_VALUE = 2
 
 kNumberOfRules = 8;
-kAutomataGenerationLength = 128;#160 //divisible by 8 please (for byte chunking)
+kAutomataGenerationLength = 64;#160 //divisible by 8 please (for byte chunking)
                                                                 # or divisible by <organism_geneLength>
-kAutomataGenerations = 150; #240
+kAutomataGenerations = 50; #240
 
 #Defaults for Class Constructor
 kDefaultRule = 30;
@@ -94,8 +94,10 @@ class Automata(object):
         
         self._currentIndex = -1
         self._overallIndex = -1
-        self._generations = [None]*kAutomataGenerations # list of AutomataGenerations of size kAutomataGenerations
+        self._generations = [AutomataGeneration()]*kAutomataGenerations # list of AutomataGenerations of size kAutomataGenerations
         self.setBinaryRuleFromInteger(rule)
+        
+        # initialize self._generations
         
         if TIME_BASED_SEED:
             random.seed()
@@ -214,13 +216,23 @@ class Automata(object):
         self.appendGeneration(next)
         
     def printBuffer(self):
+        max_digits = 7
         if (self._currentIndex == -1):
             print "*** Warning: CA not seeded, please use init_seed ***"
             return
         test = AutomataGeneration(self.p_generationLength)
         for i in xrange(kAutomataGenerations):
             test = self.generationAtIndex(i)
-            print "%d %s" % (i, self.stringFromGeneration(test))
+            if i == 0:
+                digits = 0
+            else:
+                digits = int(math.log10(i))
+            if (digits > max_digits):
+                digits = max_digits
+            if (digits < 0):
+                digits = 0
+            print " "*(max_digits-digits),
+            print "%d|%s|" % (i, self.stringFromGeneration(test))
             
     def fillBuffer(self):
         for counter in xrange(kAutomataGenerations-1):
@@ -264,7 +276,6 @@ class Automata(object):
         k,num,i,j = (0,0,0,0)
         numchunks_out = len(g)/n
         princess = [0]*numchunks_out #unsigned long
-        import pdb;pdb.set_trace()
         while i < len(g):
             num=0
             for j in xrange(n):
@@ -276,7 +287,7 @@ class Automata(object):
             if (k >= numchunks_out):
                 pass
             else:
-                princess[k] = num
+                princess[k] = int(num)
             k += 1
         return princess
     
