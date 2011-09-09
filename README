@@ -24,6 +24,32 @@ This clean solutions allows for arbitrary generations. You can, for example, run
 This project is currently in "hacking" state. No official .egg files or clean
 installer. The makefile isn't in the greatest shape.
 
+August 30 2011
+--------------
+Added a pure python version that seems to be equivalent to the C++ build but has
+not been tested thoroughly. See automata.py! And test_suite.py for compatibility
+testing.
+
+Here are benchmarks!
+
+pure python with standard cpython 2.6.5
+---------------------------------------
+time python print_ca.py 30 10000 500 --python &>/dev/null
+    user: 36.8sec
+    
+pure python with pypy (trunk [PyPy 1.6.0 with GCC 4.4.3])
+---------------------------------------------------------
+time pypy print_ca.py 30 10000 500 --python &>/dev/null
+    user: 1.140sec (wow!)
+    
+c++ with cython bindings (equivalent behavior)
+----------------------------------------------
+time python print_ca.py 30 10000 500 &>/dev/null
+    user: .290sec 
+    
+So the C++ is much much faster (~125x) than pure python. But only about 4x faster
+than pypy. As it turns out, PyEvolve with pypy is at least that fast versus the
+same algorithm with cpython, so we'll see which turns out to be overall faster!
 
 To build
 --------

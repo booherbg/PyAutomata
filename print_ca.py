@@ -7,6 +7,29 @@ python testboyx.py
 this is basically a small unit test for pyAutomata.so
 
 This is a fun one!
+
+
+benchmark information!
+pure python (pypy) vs pure python (cpython) vs c++ (cython)
+
+pure python with standard cpython 2.6.5
+---------------------------------
+time python print_ca.py 30 10000 500 --python &>/dev/null
+    user: 36.8sec
+    
+pure python with pypy (trunk [PyPy 1.6.0 with GCC 4.4.3])
+time pypy print_ca.py 30 10000 500 --python &>/dev/null
+    user: 1.140sec (wow!)
+    
+c++ with cython bindings (equivalent behavior)
+time python print_ca.py 30 10000 500 &>/dev/null
+    user: .290sec 
+    
+So the C++ is much much faster (~100x) than pure python. But only about 10x faster
+than pypy. As it turns out, PyEvolve with pypy is at least that fast versus the
+same algorithm with cpython, so we'll see which turns out to be overall faster!
+
+
 '''
 import sys
 if "--python" in sys.argv:
