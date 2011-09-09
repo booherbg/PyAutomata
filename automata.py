@@ -5,6 +5,8 @@ import math
 import random
 
 # constants, defined in Automata.h
+BITS_PER_SEED_VALUE = 2
+
 kNumberOfRules = 8;
 kAutomataGenerationLength = 128;#160 //divisible by 8 please (for byte chunking)
                                                                 # or divisible by <organism_geneLength>
@@ -125,15 +127,7 @@ class Automata(object):
             #@TODO this is because of the bitset
             # Special init_seed with full value
             if type(args[0]) == type([]) or type(()):
-                values, n = args
-                self.p_seedIsRandom = 0
-                self.p_seedStartingPosition = kDefaultSeedStartingPosition
-                g_seed = AutomataGeneration(self.p_generationLength)
-                position = 4*4/2 # hard coded, heads up. originally based on sizeof
-                for i in xrange(n):
-                    value = values[i]
-                    self.initializeSeedWithValue(g_seed, value, position)
-                    position += 4*4
+                self.init_seed_values(args[0])
                 return
             else:
                 mode = args[0]
@@ -163,7 +157,41 @@ class Automata(object):
         
         self.validateGeneration(g_seed)
         self.appendGeneration(g_seed)
-                
+        
+    def init_seed_values(self, values):
+        n = len(values)
+        self.p_seedIsRandom = 0
+        self.p_seedStartingPosition = kDefaultSeedStartingPosition
+        self._currentIndex = -1
+        self._overallIndex = -1
+        g_seed = AutomataGeneration(self.p_generationLength)
+        position = 0 # hard coded, heads up. originally based on sizeof
+        for i in xrange(n):
+            value = values[i]
+            self.initializeSeedWithValue(g_seed, value, position)
+            position += 4*BITS_PER_SEED_VALUE
+        self.validateGeneration(g_seed)
+        self.appendGeneration(g_seed)
+        
+    def initializeSeedWithValue(self, seed, value, position):
+        n = int(math.ceil(math.log(value, 2)))
+        n = 4*BITS_PER_SEED_VALUE #unsigned int*4
+        bit = 0
+        
+        if (n > len(seed)):
+            print "truncating seed, too large"
+            print "%d bits truncated to %d bits" % (n, len(seed))
+            n = len(seed)
+        if (position > len(seed) - n):
+            position = len(seed) - n
+        
+        l = reversed(range(1, n+1))
+        for i in l:
+            bit = value%2
+            if (bit == 1):
+                seed.set(i+position-1)
+            value = value / 2
+            
     def __str__(self):
         return self.stringFromGeneration(AutomataGeneration(self.p_generationLength))
         
@@ -294,29 +322,6 @@ class Automata(object):
         seed.reset()
         seed.set(position)
         
-    def initializeSeedWithValue(self, seed, value, position):
-        n = int(math.ceil(math.log(value, 2)))
-        n = 4*4 #unsigned int*4
-        w = 0
-        k = value
-        bit = 0
-        
-        if (n > len(seed)):
-            print "truncating seed, too large"
-            print "%d bits truncated to %d bits" % (n, len(seed))
-            n = len(seed)
-        if (position >= (len(seed) - (n/2))):
-            position = len(seed) - (n/2) - 1
-        if (position <= ((n/2)+1)):
-            w = 0
-        else:
-            w = (position - (n/2) + 1)
-        
-        for i in xrange(n):
-            bit = k%2
-            if (bit == 1):
-                seed.set(i+w)
-            k = k/2
             
     def setBinaryRuleFromInteger(self, numericalCode):
 #        x,y = (0,0)
