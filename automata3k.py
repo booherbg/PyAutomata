@@ -1,7 +1,7 @@
 '''
 A ballsy pure python implementation for experimenting with pypy
 '''
-from __future__ import division
+
 import math
 import random
 # constants, defined in Automata.h
@@ -53,7 +53,7 @@ class AutomataGeneration(object):
         self.generationLength = generationLength
         self._vector = [0]*generationLength
     def reset(self):
-        for i in xrange(self.generationLength):
+        for i in range(self.generationLength):
             self._vector[i] = 0
     def clear(self, index):
         self._vector[index] = 0
@@ -107,13 +107,13 @@ class pyautomata(object):
     def init_copy(self, ref, seedFromEndOfRef):
         self._currentIndex = ref._currentIndex
         _overallIndex = ref._overallIndex
-        for i in xrange(kNumberOfRules):
+        for i in range(kNumberOfRules):
             self._rule[i] = ref._rule[i]
             
         if (seedFromEndOfRef):
             self._generations[0] = ref._generations[kAutomataGenerations-1]
         else:
-            for i in xrange(kAutomataGenerations):
+            for i in range(kAutomataGenerations):
                 self._generations.append(ref._generations[i])
         
     def init_seed(self, *args):
@@ -167,7 +167,7 @@ class pyautomata(object):
         self._overallIndex = -1
         g_seed = AutomataGeneration(self.p_generationLength)
         position = 0 # hard coded, heads up. originally based on sizeof
-        for i in xrange(n):
+        for i in range(n):
             value = values[i]
             self.initializeSeedWithValue(g_seed, value, position)
             position += 4*BITS_PER_SEED_VALUE
@@ -180,13 +180,13 @@ class pyautomata(object):
         bit = 0
         
         if (n > len(seed)):
-            print "truncating seed, too large"
-            print "%d bits truncated to %d bits" % (n, len(seed))
+            print("truncating seed, too large")
+            print("%d bits truncated to %d bits" % (n, len(seed)))
             n = len(seed)
         if (position > len(seed) - n):
             position = len(seed) - n
         
-        l = reversed(range(1, n+1))
+        l = reversed(list(range(1, n+1)))
         for i in l:
             bit = value%2
             if (bit == 1):
@@ -217,10 +217,10 @@ class pyautomata(object):
     def printBuffer(self):
         max_digits = 7
         if (self._currentIndex == -1):
-            print "*** Warning: CA not seeded, please use init_seed ***"
+            print("*** Warning: CA not seeded, please use init_seed ***")
             return
         test = AutomataGeneration(self.p_generationLength)
-        for i in xrange(kAutomataGenerations):
+        for i in range(kAutomataGenerations):
             test = self.generationAtIndex(i)
             if i == 0:
                 digits = 0
@@ -230,11 +230,11 @@ class pyautomata(object):
                 digits = max_digits
             if (digits < 0):
                 digits = 0
-            print " "*(max_digits-digits),
-            print "%d|%s|" % (i, self.stringFromGeneration(test))
+            print(" "*(max_digits-digits), end=' ')
+            print("%d|%s|" % (i, self.stringFromGeneration(test)))
             
     def fillBuffer(self):
-        for counter in xrange(kAutomataGenerations-1):
+        for counter in range(kAutomataGenerations-1):
             self.iterateAutomata()
             
     def currentGenerationIndex(self):
@@ -242,7 +242,7 @@ class pyautomata(object):
     
     def stringFromGeneration(self, g):
         st = []
-        for i in xrange(len(g)):
+        for i in range(len(g)):
             if g[i] == kOffPixel:
                 st.append(kOffPixelChar)
             else:
@@ -252,7 +252,7 @@ class pyautomata(object):
     def stringFromCurrentGeneration(self):
         #g = AutomataGeneration(self.p_generationLength)
         if self._currentIndex == -1:
-            print "***Warning: CA not seeded, please use init_seed ***"
+            print("***Warning: CA not seeded, please use init_seed ***")
             return ''
         
         g = self.getCurrentGeneration()
@@ -265,7 +265,7 @@ class pyautomata(object):
     def bStringFromCurrentGeneration(self):
 #        import pdb;pdb.set_trace()
         if (self._currentIndex == -1):
-            print "*** Warning: CA not seeded, please use init_seed ***"
+            print("*** Warning: CA not seeded, please use init_seed ***")
             return ''
         g = self.getCurrentGeneration()
         s = self.bStringFromGeneration(g)
@@ -277,7 +277,7 @@ class pyautomata(object):
         princess = [0]*numchunks_out #unsigned long
         while i < len(g):
             num=0
-            for j in xrange(n):
+            for j in range(n):
                 if (i >= len(g)):
                     break
 #                print "%d < %d" % (i, len(g))
@@ -293,7 +293,7 @@ class pyautomata(object):
     def chunks_FromCurrentGeneration(self, n):
         g = self.getCurrentGeneration()
         if (self._currentIndex == -1):
-            print "*** Warning: CA not seeded, please use init_seed ***"
+            print("*** Warning: CA not seeded, please use init_seed ***")
             return 0
         c = self.chunks_FromGeneration(g, n)
         return c
@@ -309,7 +309,7 @@ class pyautomata(object):
     
     def getCurrentGeneration(self):
         if (self._currentIndex == -1):
-            print "*** Warning: CA not seeded, please use init_seed ***"
+            print("*** Warning: CA not seeded, please use init_seed ***")
             return
         return self.getGeneration(self._currentIndex)
         
@@ -322,7 +322,7 @@ class pyautomata(object):
         self._generations[self._currentIndex] = g #copy
         
     def randomizeSeed(self, seed):
-        for i in xrange(self.p_generationLength):
+        for i in range(self.p_generationLength):
             if random.randint(0, 1024) % 2 == 0:
                 seed.clear(i)
             else:
@@ -351,7 +351,7 @@ class pyautomata(object):
     def getNextGeneration(self, cg):
         ng = AutomataGeneration(self.p_generationLength)
         output, neighborhood = (0,0)
-        for position in xrange(len(cg)):
+        for position in range(len(cg)):
             neighborhood = self.getNeighborhoodForGenerationAtPosition(cg, position)
             self.validateNeighborhood(neighborhood) #redundant
             output = self.getOutputForNeighborhood(neighborhood)
@@ -418,8 +418,8 @@ if __name__ == "__main__":
     width = 10
     a = pyautomata(110, width)
     a.init_seed(0)
-    print "|%s|" % a.stringFromCurrentGeneration()
-    for i in xrange(generations-1):
+    print("|%s|" % a.stringFromCurrentGeneration())
+    for i in range(generations-1):
         a.iterateAutomata()
-        print "|%s|" % a.stringFromCurrentGeneration()
-        print a.chunks_FromCurrentGeneration(8)
+        print("|%s|" % a.stringFromCurrentGeneration())
+        print(a.chunks_FromCurrentGeneration(8))
