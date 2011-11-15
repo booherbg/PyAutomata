@@ -88,7 +88,7 @@ class pyautomata(object):
     _generations = []
     
     def __init__(self, rule, caWidth):
-        print "Initializing automaton... (rule: %d)" % rule
+        #print "Initializing automaton... (rule: %d)" % rule
         self.p_rule = rule
         self.p_generationLength = caWidth
         
