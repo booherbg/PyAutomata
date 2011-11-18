@@ -282,6 +282,14 @@ void Automata::init_seed(unsigned int values[], unsigned int n)
 	 * you want to include the number (16-bit).
 	 *
 	 * so init_seed(value=0b1111100000, position=10) should work.
+	 *
+	 * A bug. apparently if the end of the vector is cut off, the number of
+	 * digits remaining in the vector are set by the last two (not first two) of
+	 * the number only. So if there are 10 digits and two 8-bit digits are used,
+	 * like say 255 and 6, the last two will be 10 because 6 in binary ends with
+	 * 10. Weird. Doesn't affect the rest. Cancel that. It simply puts it in
+	 * without regard to what's already there. only sets one bits, ignores the
+	 * rest. so 000100 with an 8 becomes 001100. weird.
 
 	*/
 	unsigned int i;
@@ -344,7 +352,8 @@ void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int v
 	 * 		init_seed((65535, 65535))
 	 */
 
-	unsigned int n = (int)ceil(log2(value)); // number of bits required
+	unsigned int n;
+//	n = (int)ceil(log2(value)); // number of bits required
 	n = sizeof(unsigned int)*BITS_PER_SEED_VALUE; // how many bits per chunk (16-bit)
 	bool bit = 0;
 
@@ -359,8 +368,10 @@ void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int v
 	}
 
 	// if we're trying to center too close to the end of the vector, no good
-	if (position > (seed.size() - n))
-		position = seed.size() - n;
+	// should not do this, should skip if it is out of bounds but not adjust
+	// starting position since it causes overlap.
+//	if (position > (seed.size() - n))
+//		position = seed.size() - n;
 
 //	cout << "left: " << position << " w:" << w << endl;
 //	for (unsigned int i=0; i < n; ++i)
@@ -370,7 +381,10 @@ void Automata::initializeSeedWithValue (AutomataGeneration &seed, unsigned int v
 		bit = value % 2;
 		if (bit == 1)
 		{
-			seed.set((i+position-1));
+			if ((i+position-1) < seed.size())
+			{
+				seed.set((i+position-1));
+			}
 		}
 //		cout << (i-1) << ":" << bit << " ";
 		value = value / 2;

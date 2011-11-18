@@ -44,9 +44,9 @@ ${NAME}.so:	${FILES}
 #	python setup.py build_ext --inplace
 	cython --cplus ${NAME}.pyx
 	# The following was generated based on setup.py; $python setup.py build_ext --inplace
-	gcc -O2 -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -I. -I${AUTOMATA} -I/usr/include/python2.6 -c ${NAME}.cpp -o ${BUILD}/${NAME}.o
-	gcc -O2 -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -I. -I${AUTOMATA} -I/usr/include/python2.6 -c ${SOURCE}.cpp -o ${BUILD}/${SOURCE}.o
-	g++ -lm -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions ${BUILD}/${NAME}.o ${BUILD}/${SOURCE}.o -lstdc++ -o ${NAME}.so
+	gcc -march=native -O2 -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -I. -I${AUTOMATA} -I/usr/include/python2.6 -c ${NAME}.cpp -o ${BUILD}/${NAME}.o
+	gcc -march=native -O2 -pthread -fno-strict-aliasing -fwrapv -Wall -fPIC -I. -I${AUTOMATA} -I/usr/include/python2.6 -c ${SOURCE}.cpp -o ${BUILD}/${SOURCE}.o
+	g++ -march=native -lm -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions ${BUILD}/${NAME}.o ${BUILD}/${SOURCE}.o -lstdc++ -o ${NAME}.so
 
 clean:	
 	rm ${NAME}.so ${NAME}.cpp

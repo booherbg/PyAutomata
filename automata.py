@@ -175,7 +175,7 @@ class pyautomata(object):
         self.appendGeneration(g_seed)
         
     def initializeSeedWithValue(self, seed, value, position):
-        n = int(math.ceil(math.log(value, 2)))
+#        n = int(math.ceil(math.log(value, 2)))
         n = 4*BITS_PER_SEED_VALUE #unsigned int*4
         bit = 0
         
@@ -183,14 +183,15 @@ class pyautomata(object):
             print "truncating seed, too large"
             print "%d bits truncated to %d bits" % (n, len(seed))
             n = len(seed)
-        if (position > len(seed) - n):
-            position = len(seed) - n
+#        if (position > len(seed) - n):
+#            position = len(seed) - n
         
         l = reversed(range(1, n+1))
         for i in l:
             bit = value%2
             if (bit == 1):
-                seed.set(i+position-1)
+                if (i+position-1) < len(seed):
+                    seed.set(i+position-1)
             value = int(value / 2)
             
     def __str__(self):

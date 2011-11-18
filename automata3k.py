@@ -150,10 +150,10 @@ class pyautomata(object):
         elif (mode == 2):
             self.initializeSeedWithValue(g_seed, value, position)
         elif (mode == 3):
-            del g_seed
+            #del g_seed
             raise 101
         else:
-            del g_seed
+            #del g_seed
             raise 101
         
         self.validateGeneration(g_seed)
@@ -170,7 +170,7 @@ class pyautomata(object):
         for i in range(n):
             value = values[i]
             self.initializeSeedWithValue(g_seed, value, position)
-            position += 4*BITS_PER_SEED_VALUE
+            position = position + (4*BITS_PER_SEED_VALUE)
         self.validateGeneration(g_seed)
         self.appendGeneration(g_seed)
         
@@ -230,7 +230,7 @@ class pyautomata(object):
                 digits = max_digits
             if (digits < 0):
                 digits = 0
-            print(" "*(max_digits-digits), end=' ')
+            print(" "*(max_digits-digits))
             print("%d|%s|" % (i, self.stringFromGeneration(test)))
             
     def fillBuffer(self):
@@ -281,13 +281,13 @@ class pyautomata(object):
                 if (i >= len(g)):
                     break
 #                print "%d < %d" % (i, len(g))
-                num += g[i]*math.pow(2, (n-1)-j)
-                i += 1
+                num = num + (g[i]*math.pow(2, (n-1)-j))
+                i = i + 1
             if (k >= numchunks_out):
                 pass
             else:
                 princess[k] = int(num)
-            k += 1
+            k = k+1
         return princess
     
     def chunks_FromCurrentGeneration(self, n):
@@ -317,7 +317,7 @@ class pyautomata(object):
         return self.getGeneration(index)
     
     def appendGeneration(self, g):
-        self._overallIndex += 1
+        self._overallIndex = self._overallIndex + 1
         self._currentIndex = (self._currentIndex + 1) % kAutomataGenerations
         self._generations[self._currentIndex] = g #copy
         
@@ -346,7 +346,7 @@ class pyautomata(object):
                 self._rule[y] = kOnPixel
                 
 #            print "_rule[%d]: %d" % (y, self._rule[y])
-            y -= 1
+            y = y - 1
     
     def getNextGeneration(self, cg):
         ng = AutomataGeneration(self.p_generationLength)
