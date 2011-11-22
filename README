@@ -32,6 +32,11 @@ berp is not capable of using python's math libraries so this is a broken attempt
 either way, maybe the python3 version is useful to someone? Converted with
 2to3 utility.
 
+Also fixed a bug where an initialized value on the boundary of the CA would be pushed
+to the left so that the entire value would be used, overwriting the value to the 
+left of the boundary. Fixed so that the value is truncated correctly as intended.
+
+
 August 30 2011
 --------------
 Added a pure python version that seems to be equivalent to the C++ build but has
