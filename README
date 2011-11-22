@@ -24,6 +24,13 @@ This clean solutions allows for arbitrary generations. You can, for example, run
 This project is currently in "hacking" state. No official .egg files or clean
 installer. The makefile isn't in the greatest shape.
 
+November 20 2011
+----------------
+Added autodetect() set_python() and set_cpp() in __init__.py so that cpython
+can be forced to use the pure python library. autodetect() will find out if
+we are using pypy (checks for __pypy__) and sets python automatically
+
+
 November 7 2011
 ---------------
 Added a "python3" equivalent that isn't useful other than for the purpose of running
