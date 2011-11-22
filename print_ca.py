@@ -32,15 +32,23 @@ same algorithm with cpython, so we'll see which turns out to be overall faster!
 
 '''
 import sys
+import __init__ as PyAutomata
 if "--python" in sys.argv:
-    from automata import pyautomata
+    PyAutomata.set_python()
 else:
-    from pyAutomata import pyautomata
-
+    # No need to call since it's already called on import, but useful for informational purposes
+    PyAutomata.autodetect()
+pyautomata = PyAutomata.pyautomata
 
 def usage():
-    print '%s <rule> <width> <generations> [--python]' % (sys.argv[0])
-    print ' ex: %s 30 60 20' % (sys.argv[0])
+    print '%s <ca_rule> <ca_width> <num_generations> [--python] [--quiet]' % (sys.argv[0])
+    print "--quiet will not print to console, useful for benchmarks"
+    print "--python to force the use of the pure python library"
+    print "a useful benchark is this:"
+    print "python print_ca.py 30 1000 1000000 --quiet"
+    print ""
+    print "For rule 110, 1000 cells wide, 20 generations:"
+    print ' ex: %s 110 1000 20' % (sys.argv[0])
     print 'python print_ca.py 30 10000 10000 --python for an animation, haha'
     print ' expected output:'
     print '''Initializing automaton... (rule: 30)
@@ -77,7 +85,7 @@ if "--help" in sys.argv:
 try:
     rule = int(sys.argv[1])
 except IndexError:
-    rule = 109
+    rule = 30
 
 try:
     width = int(sys.argv[2])
@@ -89,16 +97,21 @@ try:
 except IndexError:
     generations = 30
 
+print "using pyautomata interface: %s" % (PyAutomata.interface)
+
 pa = pyautomata(rule, width)
 #print "|%s|" % pa.stringFromCurrentGeneration()
 pa.init_seed(0) # initialize with single "on" bit
 
 # for a more complicated seed:
 #pa.init_seed([2**16-1,0,2**16-1,0, 2**16-1, 0, 2**16, 0, 2**14+1])
-print "|%s|" % pa.stringFromCurrentGeneration()
+
+if not "--quiet" in sys.argv:
+    print "|%s|" % pa.stringFromCurrentGeneration()
 #pa.iterateAutomata()
 #print "|%s|" % pa.stringFromCurrentGeneration()
 for i in range(generations-1):
     pa.iterateAutomata()
-    print "|%s|" % pa.stringFromCurrentGeneration()
+    if not "--quiet" in sys.argv:
+        print "|%s|" % pa.stringFromCurrentGeneration()
 #    print pa.chunks_FromCurrentGeneration(8)
